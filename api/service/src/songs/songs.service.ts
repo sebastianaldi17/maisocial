@@ -9,7 +9,13 @@ export class SongsService {
     private songsModel: Model<Song>,
   ) {}
 
-  async find(title: string, artist: string, nextId: string): Promise<Song[]> {
+  async findSongs(
+    title: string,
+    artist: string,
+    nextId: string,
+    category: string,
+    version: string,
+  ): Promise<Song[]> {
     const query: RootFilterQuery<any> = {
       title: { $regex: title, $options: "i" },
       artist: { $regex: artist, $options: "i" },
@@ -19,12 +25,26 @@ export class SongsService {
       query._id = { $lt: nextId };
     }
 
-    const songs = await this.songsModel
-      .find(query)
-      .sort({ _id: -1 })
-      .limit(10)
-      .exec();
+    if (category) {
+      query.category = category;
+    }
+
+    if (version) {
+      query.version = version;
+    }
+
+    const songs = await this.songsModel.find(query).sort({ _id: -1 }).limit(10);
 
     return songs;
+  }
+
+  async getVersions(): Promise<string[]> {
+    const versions = await this.songsModel.distinct("version");
+    return versions;
+  }
+
+  async getCategories(): Promise<string[]> {
+    const categories = await this.songsModel.distinct("category");
+    return categories;
   }
 }

@@ -68,6 +68,10 @@ async function main() {
     if (result.ok) {
       const data = await result.json();
       for (const song of data) {
+        if (song.catcode === "宴会場") {
+          continue; // TODO: Handle utage songs later
+        }
+        
         const versionKey = Number(song.version.substring(0, 3));
         const version = versionMapping.get(versionKey);
 
