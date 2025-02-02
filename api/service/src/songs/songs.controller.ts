@@ -1,5 +1,13 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Query,
+} from "@nestjs/common";
 import { SongsService } from "./songs.service";
+import mongoose from "mongoose";
 
 @Controller("v1/songs")
 export class SongsController {
@@ -44,6 +52,24 @@ export class SongsController {
       songs: songs,
       lastId: songs.length > 0 ? songs[songs.length - 1]._id : "",
     };
+  }
+
+  @Get("/song/:id")
+  async getSongById(@Param("id") id: string) {
+    if (mongoose.isValidObjectId(id) === false) {
+      throw new HttpException(
+        { error: "Invalid song ID" },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const song = await this.songsService.getSongById(id);
+    if (!song) {
+      throw new HttpException(
+        { error: "Song not found" },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return song;
   }
 
   @Get("versions")

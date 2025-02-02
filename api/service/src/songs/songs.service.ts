@@ -38,6 +38,11 @@ export class SongsService {
     return songs;
   }
 
+  async getSongById(id: string): Promise<Song | null> {
+    const song = await this.songsModel.findById(id);
+    return song;
+  }
+
   async getVersions(): Promise<string[]> {
     const versions = await this.songsModel.distinct("version");
     return versions;
