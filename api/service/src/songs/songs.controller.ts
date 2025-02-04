@@ -20,6 +20,8 @@ export class SongsController {
     @Query("nextId") nextId: string,
     @Query("category") category: string,
     @Query("version") version: string,
+    @Query("minLevel") minLevel: number,
+    @Query("maxLevel") maxLevel: number,
   ) {
     if (!title) {
       title = "";
@@ -41,13 +43,24 @@ export class SongsController {
       version = "";
     }
 
+    if (!minLevel) {
+      minLevel = 0;
+    }
+
+    if (!maxLevel) {
+      maxLevel = 15;
+    }
+
     const songs = await this.songsService.findSongs(
       title,
       artist,
       nextId,
       category,
       version,
+      minLevel,
+      maxLevel,
     );
+
     return {
       songs: songs,
       lastId: songs.length > 0 ? songs[songs.length - 1]._id : "",

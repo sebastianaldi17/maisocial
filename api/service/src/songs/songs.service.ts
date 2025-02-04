@@ -15,6 +15,8 @@ export class SongsService {
     nextId: string,
     category: string,
     version: string,
+    minLevel: number,
+    maxLevel: number,
   ): Promise<Song[]> {
     const query: RootFilterQuery<any> = {
       title: { $regex: title, $options: "i" },
@@ -33,9 +35,35 @@ export class SongsService {
       query.version = version;
     }
 
+    if (minLevel) {
+
+    }
+
+    if (minLevel || maxLevel) {
+      query.difficulties = {
+        $elemMatch: {}
+      };
+
+      if (minLevel) {
+        query.difficulties.$elemMatch.internalLevel = { $gte: minLevel };
+      }
+
+      if (maxLevel) {
+        query.difficulties.$elemMatch.internalLevel = query.difficulties.$elemMatch.internalLevel || {};
+        query.difficulties.$elemMatch.internalLevel.$lte = maxLevel;
+      }
+    }
+
     const songs = await this.songsModel.find(query).sort({ _id: -1 }).limit(10);
 
-    return songs;
+    const filteredSongs = songs.map(song => {
+      const filteredDifficulties = song.difficulties.filter(difficulty => 
+        difficulty.internalLevel >= minLevel && difficulty.internalLevel <= maxLevel
+      );
+      return { ...song.toObject(), difficulties: filteredDifficulties };
+    });
+    
+    return filteredSongs as Song[];
   }
 
   async getSongById(id: string): Promise<Song | null> {

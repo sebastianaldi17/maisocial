@@ -2,7 +2,7 @@
 
 import { Difficulty } from "@/classes/difficulty";
 import { Song } from "@/classes/song";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -22,8 +22,6 @@ export default function Home() {
   const [items, setItems] = useState<Song[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
-
-  const { push } = useRouter();
 
   const fetchMoreData = (restartSearch: boolean = false) => {
     if (restartSearch) {
@@ -219,15 +217,12 @@ export default function Home() {
             }
           >
             {items.map((item) => (
-              <div
+              <Link
+                href={`/song/${item._id}`}
                 className="select-none flex flex-col p-4 my-4 border rounded-lg shadow flex hover:bg-stone-200"
                 key={item._id + "root"}
               >
-                <div
-                  key={item._id}
-                  className="flex"
-                  onClick={() => push(`/song/${item._id}`)}
-                >
+                <div key={item._id} className="flex">
                   <img
                     src={item.cover}
                     alt={item.title}
@@ -248,7 +243,7 @@ export default function Home() {
                 <div className="mt-2 flex flex-wrap gap-4 md:hidden">
                   {difficultiesComponent(item.difficulties)}
                 </div>
-              </div>
+              </Link>
             ))}
           </InfiniteScroll>
         </div>
