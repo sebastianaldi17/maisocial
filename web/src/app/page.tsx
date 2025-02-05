@@ -1,20 +1,12 @@
 "use client";
 
-import { Difficulty } from "@/classes/difficulty";
 import { Song } from "@/classes/song";
-import Link from "next/link";
+import SongCard from "@/components/index/song-card";
+import { levels } from "@/constants/constants";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 const DEBOUNCE_TIME = 500;
-
-const levels: [string, string][] = [];
-for (let i = 1; i <= 15; i++) {
-  levels.push([i.toString(), i.toString() + ".0"]);
-  if (i >= 7 && i < 15) {
-    levels.push([i.toString() + "+", i.toString() + ".6"]);
-  }
-}
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -97,52 +89,6 @@ export default function Home() {
     }
   };
 
-  const difficultiesComponent = (difficulties: Difficulty[]) => {
-    return difficulties.map((difficulty) => {
-      let backgroundColor = "bg-white";
-      const isRemaster = difficulty.difficulty.includes("RE:MASTER");
-
-      if (difficulty.difficulty.includes("BASIC")) {
-        backgroundColor = "bg-green-500";
-      } else if (difficulty.difficulty.includes("ADVANCED")) {
-        backgroundColor = "bg-amber-500";
-      } else if (difficulty.difficulty.includes("EXPERT")) {
-        backgroundColor = "bg-red-500";
-      } else if (difficulty.difficulty.includes("MASTER") && !isRemaster) {
-        backgroundColor = "bg-purple-500";
-      }
-
-      return (
-        <div
-          key={difficulty._id}
-          className={`relative w-12 h-12 flex items-center justify-center rounded-lg ${isRemaster ? "border border-purple-500" : ""} ${backgroundColor}`}
-        >
-          <span
-            className={`text-lg ${isRemaster ? "text-purple-500" : "text-white"}`}
-          >
-            {difficulty.level}
-          </span>
-          <div className="absolute w-10 h-4 bottom-9 left-6 bg-gray-800 rounded-2xl shadow-lg">
-            <p className="text-xs text-white text-center align-middle">
-              {difficulty.internalLevel}
-            </p>
-          </div>
-          {
-            <img
-              src={
-                difficulty.difficulty.includes("(DX)")
-                  ? "/type-dx.png"
-                  : "/type-std.png"
-              }
-              alt="difficulty type icon"
-              className="absolute top-9 left-6 w-12 h-4"
-            />
-          }
-        </div>
-      );
-    });
-  };
-
   useEffect(() => {
     initializeFilters();
   }, []);
@@ -170,6 +116,7 @@ export default function Home() {
 
   return (
     <div>
+      {/* div containing filters */}
       <div className="p-2">
         <div className="flex flex-col md:flex-row gap-4 mb-4 max-w-3xl mx-auto">
           <div className="flex w-full border border-gray-600 rounded-lg overflow-hidden">
@@ -256,6 +203,8 @@ export default function Home() {
           </select>
         </div>
       </div>
+
+      {/* div containing songs */}
       <div className="max-w-3xl px-2 mx-auto">
         <div>
           <InfiniteScroll
@@ -268,33 +217,7 @@ export default function Home() {
             }
           >
             {items.map((item) => (
-              <Link
-                href={`/song/${item._id}`}
-                className="select-none flex flex-col p-4 my-4 border border-gray-300 rounded-lg shadow-md flex hover:bg-stone-200"
-                key={item._id + "root"}
-              >
-                <div key={item._id} className="flex">
-                  <img
-                    src={item.cover}
-                    alt={item.title}
-                    className="mr-4 w-24 h-24 my-auto"
-                  />
-                  <div className="flex flex-col my-auto min-w-0">
-                    <p className="font-bold truncate text-ellipsis">
-                      {item.title}
-                    </p>
-                    <p className="text-gray-500 truncate text-ellipsis">
-                      {item.artist}
-                    </p>
-                    <div className="mt-2 flex-wrap gap-8 hidden md:flex">
-                      {difficultiesComponent(item.difficulties)}
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-8 md:hidden">
-                  {difficultiesComponent(item.difficulties)}
-                </div>
-              </Link>
+              <SongCard key={item._id} song={item} />
             ))}
           </InfiniteScroll>
         </div>

@@ -14,3 +14,16 @@ export interface Song extends Document {
     },
   ];
 }
+
+export interface DifficultyQuery {
+  internalLevel?: { $gte?: number; $lte?: number };
+}
+
+export interface SongQuery {
+  title?: { $regex: string; $options: string };
+  artist?: { $regex: string; $options: string };
+  _id?: { $lt: string };
+  category?: string;
+  version?: string;
+  difficulties?: { $elemMatch: DifficultyQuery };
+}

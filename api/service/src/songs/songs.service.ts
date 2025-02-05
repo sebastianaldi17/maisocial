@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Model, RootFilterQuery } from "mongoose";
-import { Song } from "src/interfaces/song.interface";
+import { Model } from "mongoose";
+import { Song, SongQuery } from "src/interfaces/song.interface";
 
 @Injectable()
 export class SongsService {
@@ -18,7 +18,7 @@ export class SongsService {
     minLevel: number,
     maxLevel: number,
   ): Promise<Song[]> {
-    const query: RootFilterQuery<any> = {
+    const query: SongQuery = {
       title: { $regex: title, $options: "i" },
       artist: { $regex: artist, $options: "i" },
     };
@@ -35,13 +35,9 @@ export class SongsService {
       query.version = version;
     }
 
-    if (minLevel) {
-
-    }
-
     if (minLevel || maxLevel) {
       query.difficulties = {
-        $elemMatch: {}
+        $elemMatch: {},
       };
 
       if (minLevel) {
@@ -49,20 +45,23 @@ export class SongsService {
       }
 
       if (maxLevel) {
-        query.difficulties.$elemMatch.internalLevel = query.difficulties.$elemMatch.internalLevel || {};
+        query.difficulties.$elemMatch.internalLevel =
+          query.difficulties.$elemMatch.internalLevel || {};
         query.difficulties.$elemMatch.internalLevel.$lte = maxLevel;
       }
     }
 
     const songs = await this.songsModel.find(query).sort({ _id: -1 }).limit(10);
 
-    const filteredSongs = songs.map(song => {
-      const filteredDifficulties = song.difficulties.filter(difficulty => 
-        difficulty.internalLevel >= minLevel && difficulty.internalLevel <= maxLevel
+    const filteredSongs = songs.map((song) => {
+      const filteredDifficulties = song.difficulties.filter(
+        (difficulty) =>
+          difficulty.internalLevel >= minLevel &&
+          difficulty.internalLevel <= maxLevel,
       );
       return { ...song.toObject(), difficulties: filteredDifficulties };
     });
-    
+
     return filteredSongs as Song[];
   }
 
