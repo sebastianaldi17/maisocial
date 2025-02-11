@@ -27,15 +27,14 @@ async function main() {
     const songHtml = await songRes.text();
     const songPage = cheerio.load(songHtml);
 
-    const bpm = songPage(
-      "body > div.wiki-contents > div.liquid > div.layout.theme0.btn-default-orange.image-align-bottom.mu-zoom-icon > div.main > div.markup.mu > div:nth-child(2) > table > tbody > tr.mu__table--row5 > td",
-    ).text();
+    const bpmTd = songPage("tr")
+      .filter((_, tr) => {
+        return songPage(tr).find("th").text().includes("BPM");
+      })
+      .find("td")
+      .text();
 
-    if (!bpm) {
-      console.log(`No BPM found for ${songTitle}, html below:`);
-      console.log(songHtml);
-    }
-    console.log(`Title: ${songTitle}, BPM: ${bpm}`);
+    console.log(`Song: ${songTitle}, BPM: ${bpmTd}`);
   }
 }
 
