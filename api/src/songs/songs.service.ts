@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
+import { Chart } from "src/interfaces/chart.interface";
 import { Song, SongQuery } from "src/interfaces/song.interface";
 
 @Injectable()
@@ -63,6 +64,53 @@ export class SongsService {
     });
 
     return filteredSongs as Song[];
+  }
+
+  async getRandomSongs(
+    minLevel: number,
+    maxLevel: number,
+    songCount: number,
+  ): Promise<Chart[]> {
+    const songs: Song[] = await this.songsModel.aggregate([
+      {
+        $match: {
+          difficulties: {
+            $elemMatch: {
+              internalLevel: {
+                $lte: maxLevel,
+                $gte: minLevel,
+              },
+            },
+          },
+        },
+      },
+      { $sample: { size: songCount } },
+    ]);
+
+    const charts: Chart[] = [];
+    for (const song of songs) {
+      for (const difficulty of song.difficulties) {
+        if (
+          difficulty.internalLevel < minLevel ||
+          difficulty.internalLevel > maxLevel
+        ) {
+          continue;
+        }
+        charts.push({
+          artist: song.artist,
+          category: song.category,
+          version: song.version,
+          title: song.title,
+          cover: song.cover,
+          difficulty: difficulty.difficulty,
+          level: difficulty.level,
+          internalLevel: difficulty.internalLevel,
+          songId: song._id,
+        });
+      }
+    }
+
+    return charts.slice(0, songCount);
   }
 
   async getSongById(id: string): Promise<Song | null> {

@@ -85,6 +85,35 @@ export class SongsController {
     return song;
   }
 
+  @Get("/random")
+  async getRandomSongs(
+    @Query("minLevel") minLevel: number,
+    @Query("maxLevel") maxLevel: number,
+    @Query("songCount") songCount: number,
+  ) {
+    if (!minLevel) {
+      minLevel = 0;
+    }
+
+    if (!maxLevel) {
+      maxLevel = 15;
+    }
+
+    if (!songCount) {
+      songCount = 1;
+    }
+
+    minLevel = Number(minLevel);
+    maxLevel = Number(maxLevel);
+    songCount = Number(songCount);
+
+    return await this.songsService.getRandomSongs(
+      minLevel,
+      maxLevel,
+      songCount,
+    );
+  }
+
   @Get("versions")
   async getVersions() {
     const versions = await this.songsService.getVersions();

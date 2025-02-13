@@ -2,7 +2,7 @@
 
 import { Song } from "@/classes/song";
 import SongCard from "@/components/index/song-card";
-import { levels } from "@/constants/constants";
+import { minLevels, maxLevels } from "@/constants/constants";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -175,7 +175,7 @@ export default function Home() {
             onChange={(e) => setMinLevel(e.target.value)}
           >
             <option value="1.0">Min level</option>
-            {levels.map((item) => {
+            {minLevels.map((item) => {
               const [label, value] = item;
               if (value === "1.0") return null;
               return (
@@ -191,7 +191,7 @@ export default function Home() {
             onChange={(e) => setMaxLevel(e.target.value)}
           >
             <option value="15.0">Max level</option>
-            {levels.map((item) => {
+            {maxLevels.map((item) => {
               const [label, value] = item;
               if (value === "15.0") return null;
               return (

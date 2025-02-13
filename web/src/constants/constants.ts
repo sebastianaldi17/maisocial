@@ -1,8 +1,11 @@
-const levels: [string, string][] = [];
+const minLevels: [string, string][] = [];
+const maxLevels: [string, string][] = [];
 for (let i = 1; i <= 15; i++) {
-  levels.push([i.toString(), i.toString() + ".0"]);
+  minLevels.push([i.toString(), i.toString() + ".0"]);
+  maxLevels.push([i.toString(), i.toString() + (i < 7 ? ".9" : ".6")]);
   if (i >= 7 && i < 15) {
-    levels.push([i.toString() + "+", i.toString() + ".6"]);
+    minLevels.push([i.toString() + "+", i.toString() + ".6"]);
+    maxLevels.push([i.toString() + "+", i.toString() + ".9"]);
   }
 }
 
@@ -18,4 +21,4 @@ const accFactor: [number, number][] = [
   [80, 13.6],
 ];
 
-export { levels, accFactor };
+export { minLevels, maxLevels, accFactor };

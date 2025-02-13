@@ -13,6 +13,7 @@ export interface Song extends Document {
       internalLevel: number;
     },
   ];
+  readonly _id: string;
 }
 
 export interface DifficultyQuery {
