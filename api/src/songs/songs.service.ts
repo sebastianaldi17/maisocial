@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Chart } from "src/interfaces/chart.interface";
 import { Song, SongQuery } from "src/interfaces/song.interface";
+import { escapeRegex } from "src/utils";
 
 @Injectable()
 export class SongsService {
@@ -19,9 +20,12 @@ export class SongsService {
     minLevel: number,
     maxLevel: number,
   ): Promise<Song[]> {
+    const sanitizedTitle = escapeRegex(title);
+    const sanitizedArtist = escapeRegex(artist);
+
     const query: SongQuery = {
-      title: { $regex: title, $options: "i" },
-      artist: { $regex: artist, $options: "i" },
+      title: { $regex: sanitizedTitle, $options: "i" },
+      artist: { $regex: sanitizedArtist, $options: "i" },
     };
 
     if (nextId) {
