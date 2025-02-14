@@ -103,6 +103,10 @@ export class SongsController {
       songCount = 1;
     }
 
+    if (songCount > 4) {
+      songCount = 4;
+    }
+
     minLevel = Number(minLevel);
     maxLevel = Number(maxLevel);
     songCount = Number(songCount);

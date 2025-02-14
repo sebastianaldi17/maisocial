@@ -7,6 +7,7 @@
     "build": "tsc",
     "initial-populate": "npm run build && cp .env dist/.env && node dist/scripts/initial-populate.js",
     "update-constants": "npm run build && cp .env dist/.env && cp service-account.json dist/service-account.json && node dist/scripts/update-constants.js",
+    "scrape-images": "npm run build && cp .env dist/.env && node dist/scripts/scrape-images.js",
     "scrape-wiki": "npm run build && cp .env dist/.env && node dist/scripts/scrape-wiki.js",
     "lint": "eslint \"**/*.ts\" --fix",
     "format": "prettier --write \"**/*.ts\""
@@ -28,6 +29,7 @@
     "typescript-eslint": "^8.22.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "google-auth-library": "^9.15.1",

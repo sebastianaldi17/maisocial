@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Model } from "mongoose";
 import { Chart } from "src/interfaces/chart.interface";
 import { Song, SongQuery } from "src/interfaces/song.interface";
-import { escapeRegex } from "src/utils";
+import { escapeRegex, shuffleArray } from "src/utils";
 
 @Injectable()
 export class SongsService {
@@ -114,7 +114,7 @@ export class SongsService {
       }
     }
 
-    return charts.slice(0, songCount);
+    return shuffleArray(charts).slice(0, songCount);
   }
 
   async getSongById(id: string): Promise<Song | null> {
