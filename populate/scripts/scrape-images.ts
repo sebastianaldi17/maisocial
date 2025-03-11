@@ -7,7 +7,6 @@ import { songModel } from "../src/models";
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; // Use at your own risk
 
-const lastTitle = "リアライズ";
 const DELAY = 500;
 
 async function main() {
@@ -19,8 +18,6 @@ async function main() {
       process.env.SUPABASE_KEY,
     );
 
-    let resume = false;
-
     const result = await fetch(API_URL);
     if (result.ok) {
       console.log("Fetched song data");
@@ -31,11 +28,19 @@ async function main() {
           continue;
         }
 
-        if (song.title === lastTitle) {
-          resume = true;
-        }
+        const existingSong = await songModel.findOne({
+          title: song.title,
+          category: song.catcode,
+          artist: song.artist,
+        });
 
-        if (!resume) {
+        if (
+          existingSong &&
+          !existingSong.cover?.startsWith(
+            "https://maimaidx.jp/maimai-mobile/img/Music/",
+          )
+        ) {
+          console.log(`Image already exists for ${song.title}`);
           continue;
         }
 
@@ -79,6 +84,8 @@ async function main() {
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    process.exit(0);
   }
 }
 

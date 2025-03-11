@@ -8,7 +8,6 @@
     "initial-populate": "npm run build && cp .env dist/.env && node dist/scripts/initial-populate.js",
     "update-constants": "npm run build && cp .env dist/.env && cp service-account.json dist/service-account.json && node dist/scripts/update-constants.js",
     "scrape-images": "npm run build && cp .env dist/.env && node dist/scripts/scrape-images.js",
-    "scrape-wiki": "npm run build && cp .env dist/.env && node dist/scripts/scrape-wiki.js",
     "lint": "eslint \"**/*.ts\" --fix",
     "format": "prettier --write \"**/*.ts\""
   },

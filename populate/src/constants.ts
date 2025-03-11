@@ -54,6 +54,7 @@ export const diffMapping = new Map([
 ]);
 
 /* eslint-disable no-irregular-whitespace */
+// Format is [sheet title, db title]
 export const titleHotfix = new Map([
   ["Excalibur ～Revived Resolution～", `Excalibur ～Revived resolution～`],
   ["“411Ψ892”", `"411Ψ892"`],
@@ -118,5 +119,8 @@ export const titleHotfix = new Map([
     "ずんだもんの朝食　〜目覚ましずんラップ〜",
   ],
   ["プラネタリウム・レビュー", "プラネタリウム・レヴュー"],
+  ["R’N’R Monsta", "R'N'R Monsta"],
+  ["falling", "Falling"],
+  ["ウッーウッーウマウマ( ﾟ∀ﾟ)", "ウッーウッーウマウマ(ﾟ∀ﾟ)"],
 ]);
 /* eslint-enable */
