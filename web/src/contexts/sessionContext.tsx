@@ -25,6 +25,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const signIn = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
     });
   };
 
@@ -37,14 +40,34 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateNickname = async (nickname: string) => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/nickname`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.access_token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/nickname`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ nickname }),
       },
-      body: JSON.stringify({ nickname }),
-    });
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update nickname");
+    }
+
+    const {
+      data: { session: newSession },
+      error,
+    } = await supabase.auth.refreshSession();
+
+    if (error) {
+      console.error("Error refreshing session:", error.message);
+      throw error;
+    }
+
+    // Update the local session state with new JWT
+    setSession(newSession);
 
     return;
   };
