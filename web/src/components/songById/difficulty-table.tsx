@@ -12,16 +12,16 @@ export default function DifficultyTable({
 }: DifficultyTableProps) {
   return (
     <>
-      <table className="w-fit border border-gray-400">
+      <table className="border border-gray-400 w-full table-fixed">
         <thead>
           <tr>
-            <th className="border border-gray-400 px-4 py-2 bg-gray-200">
+            <th className="border border-gray-400 bg-gray-200 w-[35%]">
               Level
             </th>
-            <th className="border border-gray-400 px-4 py-2 bg-gray-200">
+            <th className="border border-gray-400 bg-gray-200 w-[32%]">
               Constant
             </th>
-            <th className="border border-gray-400 px-4 py-2 bg-gray-200">
+            <th className="border border-gray-400 bg-gray-200 w-[33%]">
               Estimated rating
             </th>
           </tr>
@@ -49,7 +49,7 @@ export default function DifficultyTable({
                 <td
                   className={`border border-gray-400 flex gap-2 ${backgroundColor}`}
                 >
-                  <p className="flex-1 pl-2">{difficulty.level}</p>
+                  <p className="pl-2">{difficulty.level}</p>
                   <img
                     src={
                       difficulty.difficulty.includes("(DX)")

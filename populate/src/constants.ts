@@ -26,6 +26,7 @@ export const versionMapping = new Map([
   [240, "BUDDiES"],
   [245, "BUDDiES PLUS"],
   [250, "PRiSM"],
+  [255, "PRiSM PLUS"],
 ]);
 
 export const difficultyFieldNames: [string, string][] = [

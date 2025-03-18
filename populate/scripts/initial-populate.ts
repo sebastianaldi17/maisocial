@@ -26,17 +26,6 @@ async function main() {
 
         const difficulties = [];
 
-        const existingSong = await songModel.findOne({
-          title: song.title,
-          category: song.catcode,
-          artist: song.artist,
-        });
-
-        if (existingSong && existingSong.difficulties?.length > 0) {
-          console.log(`Song ${song.title} already exists in DB`);
-          continue;
-        }
-
         for (const [fieldName, difficulty] of difficultyFieldNames) {
           if (song[fieldName]) {
             let internalLevel = parseInt(
@@ -49,6 +38,34 @@ async function main() {
               new Difficulty(difficulty, song[fieldName], internalLevel),
             );
           }
+        }
+
+        const existingSong = await songModel.findOne({
+          title: song.title,
+          category: song.catcode,
+          artist: song.artist,
+        });
+
+        if (existingSong && existingSong.difficulties?.length > 0) {
+          // Compare difficulties and update if needed
+          let hasChanges = false;
+          existingSong.set({
+            difficulties: existingSong.difficulties.map((existingDiff) => {
+              const newDiff = difficulties.find(
+                (d) => d.difficulty === existingDiff.difficulty,
+              );
+              if (newDiff && existingDiff.level !== newDiff.level) {
+                hasChanges = true;
+                return { ...existingDiff, level: newDiff.level };
+              }
+              return existingDiff;
+            }),
+          });
+
+          if (hasChanges) {
+            await existingSong.save();
+          }
+          continue;
         }
 
         await songModel.findOneAndUpdate(

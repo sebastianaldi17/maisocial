@@ -138,69 +138,73 @@ export default function Home() {
             </select>
           </div>
         </div>
-        <div className="flex flex-row flex-wrap gap-4 mb-4 max-w-3xl mx-auto">
-          <select
-            className="p-2 border border-gray-600 rounded-lg w-2/5 md:w-1/5"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-            }}
-          >
-            <option value="">All categories</option>
-            {categories.map((category) => {
-              return (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              );
-            })}
-          </select>
-          <select
-            className="p-2 border border-gray-600 rounded-lg w-2/5 md:w-1/5"
-            value={version}
-            onChange={(e) => setVersion(e.target.value)}
-          >
-            <option value="">All versions</option>
-            {versions.map((version) => {
-              return (
-                <option key={version} value={version}>
-                  {version}
-                </option>
-              );
-            })}
-          </select>
-          <select
-            className="p-2 border border-gray-600 rounded-lg w-2/5 md:w-1/5"
-            value={minLevel}
-            onChange={(e) => setMinLevel(e.target.value)}
-          >
-            <option value="1.0">Min level</option>
-            {minLevels.map((item) => {
-              const [label, value] = item;
-              if (value === "1.0") return null;
-              return (
-                <option key={`${label}-min`} value={value}>
-                  {label}
-                </option>
-              );
-            })}
-          </select>
-          <select
-            className="p-2 border border-gray-600 rounded-lg w-2/5 md:w-1/5"
-            value={maxLevel}
-            onChange={(e) => setMaxLevel(e.target.value)}
-          >
-            <option value="15.0">Max level</option>
-            {maxLevels.map((item) => {
-              const [label, value] = item;
-              if (value === "15.0") return null;
-              return (
-                <option key={`${label}-max`} value={value}>
-                  {label}
-                </option>
-              );
-            })}
-          </select>
+        <div className="flex flex-col gap-4 mb-4 max-w-3xl mx-auto">
+          <div className="flex flex-row flex-wrap gap-4">
+            <select
+              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+              }}
+            >
+              <option value="">All categories</option>
+              {categories.map((category) => {
+                return (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                );
+              })}
+            </select>
+            <select
+              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+            >
+              <option value="">All versions</option>
+              {versions.map((version) => {
+                return (
+                  <option key={version} value={version}>
+                    {version}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="flex flex-row flex-wrap gap-4">
+            <select
+              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              value={minLevel}
+              onChange={(e) => setMinLevel(e.target.value)}
+            >
+              <option value="1.0">Min level</option>
+              {minLevels.map((item) => {
+                const [label, value] = item;
+                if (value === "1.0") return null;
+                return (
+                  <option key={`${label}-min`} value={value}>
+                    {label}
+                  </option>
+                );
+              })}
+            </select>
+            <select
+              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              value={maxLevel}
+              onChange={(e) => setMaxLevel(e.target.value)}
+            >
+              <option value="15.0">Max level</option>
+              {maxLevels.map((item) => {
+                const [label, value] = item;
+                if (value === "15.0") return null;
+                return (
+                  <option key={`${label}-max`} value={value}>
+                    {label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 

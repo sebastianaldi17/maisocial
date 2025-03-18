@@ -27,7 +27,7 @@ export default function SongCard({ song }: SongCardProps) {
           </div>
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap gap-8 md:hidden">
+      <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4 md:hidden">
         <DifficultyBadges difficulties={song.difficulties} />
       </div>
     </Link>
