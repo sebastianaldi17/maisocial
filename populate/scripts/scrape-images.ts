@@ -1,15 +1,79 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { API_URL } from "../src/constants";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import sleep from "../src/utils";
 import { songModel } from "../src/models";
+import { readFileSync, writeFileSync } from "fs";
+import { resolve } from "path";
+import { execSync } from "child_process";
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"; // Use at your own risk
 
 const DELAY = 500;
 
+interface Song {
+  title: string;
+  artist: string;
+  catcode: string;
+  image_url: string;
+}
+
+async function processAndUploadWebpImage(
+  supabase: SupabaseClient,
+  pngCover: string,
+  song: Song,
+) {
+  const pngFetch = await fetch(pngCover);
+  const pngBlob = await pngFetch.blob();
+  const pngBuffer = await pngBlob.arrayBuffer();
+  writeFileSync(resolve(__dirname, "image.png"), Buffer.from(pngBuffer));
+  execSync(
+    `cwebp -quiet -q 80 -m 6 -mt -o ${resolve(
+      __dirname,
+      "image.webp",
+    )} ${resolve(__dirname, "image.png")}`,
+  );
+  const imageWebp = readFileSync(resolve(__dirname, "image.webp"));
+  const { error } = await supabase.storage
+    .from("thumbnails")
+    .upload(
+      `public/webp/${song.image_url.replace(".png", ".webp")}`,
+      imageWebp,
+      {
+        upsert: true,
+      },
+    );
+  if (error) {
+    console.error(`Got error uploading image for ${song.title}`);
+    console.error(error);
+    return;
+  }
+  const webpImageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/thumbnails/public/webp/${song.image_url.replace(".png", ".webp")}`;
+  await songModel.findOneAndUpdate(
+    {
+      title: song.title,
+      category: song.catcode,
+      artist: song.artist,
+    },
+    {
+      cover: webpImageUrl,
+    },
+    { upsert: true },
+  );
+  console.log(`Uploaded webp image for ${song.title}`);
+}
+
 async function main() {
+  let hasWebp = false;
+  try {
+    execSync("which cwebp");
+    hasWebp = true;
+  } catch (error) {
+    console.error(error);
+    console.error("cwebp not found, skipping image conversion");
+  }
+
   try {
     await mongoose.connect(process.env.MONGODB);
 
@@ -40,8 +104,12 @@ async function main() {
             "https://maimaidx.jp/maimai-mobile/img/Music/",
           )
         ) {
-          console.log(`Image already exists for ${song.title}`);
-          continue;
+          if (!hasWebp || existingSong.cover.endsWith(".webp")) {
+            console.log(`Image already exists for ${song.title}`);
+            continue;
+          }
+
+          processAndUploadWebpImage(supabase, existingSong.cover, song);
         }
 
         await sleep(DELAY);
@@ -77,6 +145,10 @@ async function main() {
           );
 
           console.log(`Uploaded image for ${song.title}`);
+
+          if (hasWebp) {
+            await processAndUploadWebpImage(supabase, pngImageUrl, song);
+          }
         } else {
           console.error(`Failed to fetch image for ${song.title}`);
         }

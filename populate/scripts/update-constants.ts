@@ -4,7 +4,7 @@ import creds from "../service-account.json";
 import { loadSpreadsheet } from "../src/spreadsheeet-client";
 import {
   diffMapping,
-  PRISM_SPREADSHEET_ID,
+  PRiSM_PLUS_SPREADSHEET_ID,
   titleHotfix,
 } from "../src/constants";
 import { GoogleSpreadsheet } from "google-spreadsheet";
@@ -21,13 +21,13 @@ async function main() {
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
-    const spreadsheet = loadSpreadsheet(PRISM_SPREADSHEET_ID, auth);
+    const spreadsheet = loadSpreadsheet(PRiSM_PLUS_SPREADSHEET_ID, auth);
 
     await spreadsheet.loadInfo();
 
     console.log("Loaded spreadsheet");
 
-    await updatePrismConstants(spreadsheet);
+    await updatePrismPlusConstants(spreadsheet);
   } catch (error) {
     console.error(error);
   } finally {
@@ -35,12 +35,12 @@ async function main() {
   }
 }
 
-async function updatePrismConstants(spreadsheet: GoogleSpreadsheet) {
+async function updatePrismPlusConstants(spreadsheet: GoogleSpreadsheet) {
   await updateConstantFromSheet(
     spreadsheet,
-    "PRiSM新曲",
+    "PRiSM PLUS新曲",
     [0, 1, 2, 4],
-    [0, 6, 12, 18, 24],
+    [0, 6],
   );
   await updateConstantFromSheet(
     spreadsheet,
@@ -51,16 +51,37 @@ async function updatePrismConstants(spreadsheet: GoogleSpreadsheet) {
   await updateConstantFromSheet(
     spreadsheet,
     "13+",
-    [0, 2, 3, 5],
-    [0, 7, 14, 21, 28],
-  );
-  await updateConstantFromSheet(
-    spreadsheet,
-    "13",
-    [0, 2, 3, 5],
-    [0, 8, 15, 22, 29, 36],
+    [0, 1, 2, 4],
+    [0, 6, 12, 18],
   );
 }
+
+// async function updatePrismConstants(spreadsheet: GoogleSpreadsheet) {
+//   await updateConstantFromSheet(
+//     spreadsheet,
+//     "PRiSM新曲",
+//     [0, 1, 2, 4],
+//     [0, 6, 12, 18, 24],
+//   );
+//   await updateConstantFromSheet(
+//     spreadsheet,
+//     "14以上",
+//     [0, 2, 3, 5],
+//     [0, 7, 14, 21, 28],
+//   );
+//   await updateConstantFromSheet(
+//     spreadsheet,
+//     "13+",
+//     [0, 2, 3, 5],
+//     [0, 7, 14, 21, 28],
+//   );
+//   await updateConstantFromSheet(
+//     spreadsheet,
+//     "13",
+//     [0, 2, 3, 5],
+//     [0, 8, 15, 22, 29, 36],
+//   );
+// }
 
 async function updateConstantFromSheet(
   spreadsheeet: GoogleSpreadsheet,

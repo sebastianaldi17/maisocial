@@ -47,6 +47,8 @@ export const PRISM_SPREADSHEET_ID =
   "1DKssDl2MM-jjK_GmHPEIVcOMcpVzaeiXA9P5hmhDqAo";
 export const BUDDIES_PLUS_SPREADSHEET_ID =
   "1d1AjO92Hj-iay10MsqdR_5TswEaikzC988aEOtFyybo";
+export const PRiSM_PLUS_SPREADSHEET_ID =
+  "10N6jmyrzmHrZGbGhDWfpdg4hQKm0t84H2DPkaFG7PNs";
 
 export const diffMapping = new Map([
   ["ReMAS", "RE:MASTER"],
@@ -123,5 +125,6 @@ export const titleHotfix = new Map([
   ["R’N’R Monsta", "R'N'R Monsta"],
   ["falling", "Falling"],
   ["ウッーウッーウマウマ( ﾟ∀ﾟ)", "ウッーウッーウマウマ(ﾟ∀ﾟ)"],
+  ["Åntinomiε", "Åntinomiε"],
 ]);
 /* eslint-enable */

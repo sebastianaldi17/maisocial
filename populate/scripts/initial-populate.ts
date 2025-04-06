@@ -62,6 +62,18 @@ async function main() {
             }),
           });
 
+          // Check if any new difficulties were added
+          for (const newDiff of difficulties) {
+            if (
+              !existingSong.difficulties.some(
+                (d) => d.difficulty === newDiff.difficulty,
+              )
+            ) {
+              existingSong.difficulties.push(newDiff);
+              hasChanges = true;
+            }
+          }
+
           if (hasChanges) {
             await existingSong.save();
           }
