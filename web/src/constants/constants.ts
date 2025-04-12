@@ -2,9 +2,9 @@ const minLevels: [string, string][] = [];
 const maxLevels: [string, string][] = [];
 for (let i = 1; i <= 15; i++) {
   minLevels.push([i.toString(), i.toString() + ".0"]);
-  maxLevels.push([i.toString(), i.toString() + (i < 7 ? ".9" : ".6")]);
+  maxLevels.push([i.toString(), i.toString() + (i < 7 ? ".9" : ".5")]);
   if (i >= 7 && i < 15) {
-    minLevels.push([i.toString() + "+", i.toString() + ".6"]);
+    minLevels.push([i.toString() + "+", i.toString() + ".5"]);
     maxLevels.push([i.toString() + "+", i.toString() + ".9"]);
   }
 }
