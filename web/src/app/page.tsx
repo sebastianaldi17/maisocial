@@ -2,7 +2,13 @@
 
 import { Song } from "@/classes/song";
 import SongCard from "@/components/index/song-card";
-import { minLevels, maxLevels } from "@/constants/constants";
+import {
+  minLevels,
+  maxLevels,
+  levels,
+  DifficultyFilterMode,
+} from "@/constants/constants";
+import { LucideBookA, LucideHash } from "lucide-react";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -19,6 +25,7 @@ export default function Home() {
 
   const [fetching, setFetching] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [useConstant, setUseConstant] = useState(false);
   const [firstRender, setFirstRender] = useState(true);
 
   const [items, setItems] = useState<Song[]>([]);
@@ -87,6 +94,24 @@ export default function Home() {
       const data = await versionsResponse.json();
       setVersions(data.versions);
     }
+  };
+
+  const getLevels = (mode: DifficultyFilterMode) => {
+    if (useConstant) {
+      return levels;
+    }
+
+    if (mode === DifficultyFilterMode.Min) {
+      return minLevels;
+    } else {
+      return maxLevels;
+    }
+  };
+
+  const toggleConstantSearch = () => {
+    setUseConstant(!useConstant);
+    setMinLevel("1.0");
+    setMaxLevel("15.0");
   };
 
   useEffect(() => {
@@ -171,14 +196,14 @@ export default function Home() {
               })}
             </select>
           </div>
-          <div className="flex flex-row flex-wrap gap-4">
+          <div className="flex flex-row gap-4">
             <select
-              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              className="p-2 border border-gray-600 rounded-lg flex-1"
               value={minLevel}
               onChange={(e) => setMinLevel(e.target.value)}
             >
               <option value="1.0">Min level</option>
-              {minLevels.map((item) => {
+              {getLevels(DifficultyFilterMode.Min).map((item) => {
                 const [label, value] = item;
                 if (value === "1.0") return null;
                 return (
@@ -189,12 +214,12 @@ export default function Home() {
               })}
             </select>
             <select
-              className="p-2 border border-gray-600 rounded-lg w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)]"
+              className="p-2 border border-gray-600 rounded-lg flex-1"
               value={maxLevel}
               onChange={(e) => setMaxLevel(e.target.value)}
             >
               <option value="15.0">Max level</option>
-              {maxLevels.map((item) => {
+              {getLevels(DifficultyFilterMode.Max).map((item) => {
                 const [label, value] = item;
                 if (value === "15.0") return null;
                 return (
@@ -204,6 +229,14 @@ export default function Home() {
                 );
               })}
             </select>
+            <button
+              className="hover:bg-gray-200 p-2 border border-gray-600 rounded-lg flex items-center justify-center"
+              onClick={() => {
+                toggleConstantSearch();
+              }}
+            >
+              {useConstant ? <LucideBookA /> : <LucideHash />}
+            </button>
           </div>
         </div>
       </div>

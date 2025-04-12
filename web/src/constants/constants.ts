@@ -1,10 +1,20 @@
 const minLevels: [string, string][] = [];
 const maxLevels: [string, string][] = [];
+const levels: [string, string][] = [];
+
 for (let i = 1; i <= 15; i++) {
+  if (i >= 12 && i < 15) {
+    for (let j = 0.1; j < 1; j += 0.1) {
+      const level = (i + j).toFixed(1);
+      levels.push([level, level]);
+    }
+  } else {
+    levels.push([i.toString(), i.toString()]);
+  }
   minLevels.push([i.toString(), i.toString() + ".0"]);
   maxLevels.push([i.toString(), i.toString() + (i < 7 ? ".9" : ".5")]);
   if (i >= 7 && i < 15) {
-    minLevels.push([i.toString() + "+", i.toString() + ".5"]);
+    minLevels.push([i.toString() + "+", i.toString() + ".6"]);
     maxLevels.push([i.toString() + "+", i.toString() + ".9"]);
   }
 }
@@ -21,4 +31,9 @@ const accFactor: [number, number][] = [
   [80, 13.6],
 ];
 
-export { minLevels, maxLevels, accFactor };
+export enum DifficultyFilterMode {
+  Min,
+  Max,
+}
+
+export { levels, minLevels, maxLevels, accFactor };
