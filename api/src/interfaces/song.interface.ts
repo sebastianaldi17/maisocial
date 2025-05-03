@@ -2,6 +2,7 @@ import { Document } from "mongoose";
 
 export interface Song extends Document {
   readonly artist: string;
+  readonly alternateTitle: string;
   readonly title: string;
   readonly version: string;
   readonly category: string;
@@ -21,6 +22,7 @@ export interface DifficultyQuery {
 }
 
 export interface SongQuery {
+  alternateTitle?: { $regex: string; $options: string };
   title?: { $regex: string; $options: string };
   artist?: { $regex: string; $options: string };
   _id?: { $lt: string };

@@ -22,6 +22,7 @@ export class SongsController {
     @Query("version") version: string,
     @Query("minLevel") minLevel: number,
     @Query("maxLevel") maxLevel: number,
+    @Query("fuzzy") fuzzy: string,
   ) {
     if (!title) {
       title = "";
@@ -51,6 +52,8 @@ export class SongsController {
       maxLevel = 15;
     }
 
+    const fuzzyFilter = fuzzy === "true" ? true : false;
+
     const songs = await this.songsService.findSongs(
       title,
       artist,
@@ -59,6 +62,7 @@ export class SongsController {
       version,
       minLevel,
       maxLevel,
+      fuzzyFilter,
     );
 
     return {

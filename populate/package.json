@@ -33,6 +33,8 @@
     "dotenv": "^16.4.7",
     "google-auth-library": "^9.15.1",
     "google-spreadsheet": "^4.1.4",
+    "kuroshiro": "^1.2.0",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "mongoose": "^8.9.5"
   }
 }

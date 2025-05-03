@@ -8,7 +8,12 @@ import {
   levels,
   DifficultyFilterMode,
 } from "@/constants/constants";
-import { LucideBookA, LucideHash } from "lucide-react";
+import {
+  LucideBookA,
+  LucideChartScatter,
+  LucideHash,
+  LucideWholeWord,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -22,6 +27,7 @@ export default function Home() {
   const [minLevel, setMinLevel] = useState("0");
   const [maxLevel, setMaxLevel] = useState("15");
   const [lastId, setLastId] = useState("");
+  const [fuzzySearch, setFuzzySearch] = useState(false);
 
   const [fetching, setFetching] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -48,6 +54,7 @@ export default function Home() {
       version,
       minLevel,
       maxLevel,
+      fuzzySearch,
     );
   };
 
@@ -59,10 +66,11 @@ export default function Home() {
     version: string,
     minLevel: string = "1.0",
     maxLevel: string = "15.0",
+    fuzzySearch: boolean = false,
   ) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/songs?nextId=${nextId}&title=${title}&artist=${artist}&category=${category}&version=${version}&minLevel=${minLevel}&maxLevel=${maxLevel}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/songs?nextId=${nextId}&title=${title}&artist=${artist}&category=${category}&version=${version}&minLevel=${minLevel}&maxLevel=${maxLevel}&fuzzy=${fuzzySearch}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -114,6 +122,11 @@ export default function Home() {
     setMaxLevel("15.0");
   };
 
+  const toggleFuzzySearch = () => {
+    setFuzzySearch(!fuzzySearch);
+    setSearch("");
+  };
+
   useEffect(() => {
     initializeFilters();
   }, []);
@@ -151,11 +164,22 @@ export default function Home() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            {filter === "title" && (
+              <button
+                className="hover:bg-gray-200 p-2 border border-gray-600 flex items-center justify-center"
+                onClick={() => {
+                  toggleFuzzySearch();
+                }}
+              >
+                {fuzzySearch ? <LucideChartScatter /> : <LucideWholeWord />}
+              </button>
+            )}
             <select
               className="p-2 border-l border-gray-600"
               value={filter}
               onChange={(e) => {
                 setFilter(e.target.value);
+                setFuzzySearch(false);
               }}
             >
               <option value="title">Title</option>
@@ -207,7 +231,7 @@ export default function Home() {
                 const [label, value] = item;
                 if (value === "1.0") return null;
                 return (
-                  <option key={`${label}-min`} value={value}>
+                  <option key={`${value}-min`} value={value}>
                     {label}
                   </option>
                 );
@@ -235,7 +259,7 @@ export default function Home() {
                 toggleConstantSearch();
               }}
             >
-              {useConstant ? <LucideBookA /> : <LucideHash />}
+              {useConstant ? <LucideHash /> : <LucideBookA />}
             </button>
           </div>
         </div>

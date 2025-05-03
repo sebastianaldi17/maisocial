@@ -4,7 +4,7 @@ const levels: [string, string][] = [];
 
 for (let i = 1; i <= 15; i++) {
   if (i >= 12 && i < 15) {
-    for (let j = 0.1; j < 1; j += 0.1) {
+    for (let j = 0; j <= 0.9; j += 0.1) {
       const level = (i + j).toFixed(1);
       levels.push([level, level]);
     }

@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { API_URL } from "../src/constants";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import sleep from "../src/utils";
+import { sleep } from "../src/utils";
 import { songModel } from "../src/models";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
@@ -110,6 +110,7 @@ async function main() {
           }
 
           processAndUploadWebpImage(supabase, existingSong.cover, song);
+          continue;
         }
 
         await sleep(DELAY);

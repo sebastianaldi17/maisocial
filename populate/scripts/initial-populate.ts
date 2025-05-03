@@ -7,10 +7,16 @@ import {
 } from "../src/constants";
 import { songModel } from "../src/models";
 import { Difficulty } from "../src/classes";
+import Kuroshiro from "kuroshiro";
+import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
+import { convertMacrons } from "../src/utils";
 
 async function main() {
   try {
     await mongoose.connect(process.env.MONGODB);
+
+    const kuroshiro = new Kuroshiro();
+    await kuroshiro.init(new KuromojiAnalyzer());
 
     const result = await fetch(API_URL);
     if (result.ok) {
@@ -20,6 +26,12 @@ async function main() {
           // TODO: Handle utage songs in a separate collection later
           continue;
         }
+
+        // Convert title to romaji
+        const romajiTitle = await kuroshiro.convert(song.title, {
+          to: "romaji",
+        });
+        const alternateTitle = convertMacrons(romajiTitle);
 
         const versionKey = Number(song.version.substring(0, 3));
         const version = versionMapping.get(versionKey);
@@ -74,7 +86,16 @@ async function main() {
             }
           }
 
+          if (
+            !existingSong.alternateTitle ||
+            existingSong.alternateTitle !== alternateTitle
+          ) {
+            existingSong.alternateTitle = alternateTitle;
+            hasChanges = true;
+          }
+
           if (hasChanges) {
+            console.log(`Updating ${song.title} in DB`);
             await existingSong.save();
           }
           continue;
@@ -88,6 +109,7 @@ async function main() {
           },
           {
             artist: song.artist,
+            alternateTitle: alternateTitle,
             title: song.title,
             version: version,
             category: song.catcode,

@@ -19,14 +19,20 @@ export class SongsService {
     version: string,
     minLevel: number,
     maxLevel: number,
+    fuzzy: boolean,
   ): Promise<Song[]> {
     const sanitizedTitle = escapeRegex(title);
     const sanitizedArtist = escapeRegex(artist);
 
     const query: SongQuery = {
-      title: { $regex: sanitizedTitle, $options: "i" },
       artist: { $regex: sanitizedArtist, $options: "i" },
     };
+
+    if (fuzzy) {
+      query.alternateTitle = { $regex: sanitizedTitle, $options: "i" };
+    } else {
+      query.title = { $regex: sanitizedTitle, $options: "i" };
+    }
 
     if (nextId) {
       query._id = { $lt: nextId };
