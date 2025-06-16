@@ -11,6 +11,17 @@ export interface Comment extends Document {
 }
 
 export interface CommentQuery {
-  parentId: string;
+  userId?: string;
+  parentId?: string;
   _id?: { $lt: string };
+}
+
+export interface UserCommentWithSong {
+  commentId: string;
+  songId: string;
+  title: string;
+  artist: string;
+  comment: string;
+  songCover: string;
+  commentTime: string;
 }

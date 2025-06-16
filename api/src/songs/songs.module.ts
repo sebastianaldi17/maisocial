@@ -8,5 +8,6 @@ import { SongsController } from "./songs.controller";
   imports: [DatabaseModule],
   controllers: [SongsController],
   providers: [SongsService, ...songsProviders],
+  exports: [SongsService],
 })
 export class SongsModule {}

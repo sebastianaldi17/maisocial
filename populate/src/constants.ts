@@ -126,5 +126,7 @@ export const titleHotfix = new Map([
   ["falling", "Falling"],
   ["ウッーウッーウマウマ( ﾟ∀ﾟ)", "ウッーウッーウマウマ(ﾟ∀ﾟ)"],
   ["Åntinomiε", "Åntinomiε"],
+  ["ATLUS RUSH", "ATLAS RUSH"],
+  ["好きな総菜発表ドラゴン", "好きな惣菜発表ドラゴン"],
 ]);
 /* eslint-enable */

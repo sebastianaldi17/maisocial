@@ -41,11 +41,21 @@ export default function MainLayout({
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out z-50 flex flex-col`}
       >
-        <nav className="p-4 space-y-4">
+        <nav className="px-4 pt-4">
           <Link href="/" className="block p-2 rounded hover:bg-gray-700">
             Songs
           </Link>
         </nav>
+        {session && (
+          <nav className="px-4 py-2">
+            <Link
+              className="block p-2 rounded hover:bg-gray-700"
+              href="/my-comments"
+            >
+              Your comments
+            </Link>
+          </nav>
+        )}
         <div className="flex-1" />
         <div className="p-4 border-t border-gray-700">
           {session && (

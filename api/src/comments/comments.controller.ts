@@ -76,6 +76,30 @@ export class CommentsController {
     };
   }
 
+  @Get("/user")
+  @UseGuards(SupabaseGuard)
+  async getUserComments(
+    @Request() request: CustomRequest,
+    @Query("nextId") nextId: string,
+  ) {
+    const { user } = request;
+    if (!user || !user.id) {
+      throw new HttpException(
+        "You must be logged in to view your comments",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const comments = await this.commentsService.getCommentsByUserId(
+      user.id,
+      nextId,
+    );
+    return {
+      comments: comments,
+      lastId:
+        comments.length > 0 ? comments[comments.length - 1].commentId : "",
+    };
+  }
+
   @Delete("/:commentId")
   @UseGuards(SupabaseGuard)
   @UseGuards(ThrottlerGuard)

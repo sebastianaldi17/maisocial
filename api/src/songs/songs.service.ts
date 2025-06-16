@@ -128,6 +128,19 @@ export class SongsService {
     return song;
   }
 
+  async getSongsByIds(ids: string[]): Promise<Map<string, Song>> {
+    const songs = await this.songsModel.find({
+      _id: {
+        $in: ids,
+      },
+    });
+    const songsMap = new Map<string, Song>();
+    for (const song of songs) {
+      songsMap.set(song._id.toString(), song);
+    }
+    return songsMap;
+  }
+
   async getVersions(): Promise<string[]> {
     const versions = await this.songsModel.distinct("version");
     return versions;

@@ -12,3 +12,18 @@ export type CommentsResponse = {
   comments: Comment[];
   lastId: string;
 };
+
+export type UserComment = {
+  commentId: string;
+  songId: string;
+  title: string;
+  artist: string;
+  comment: string;
+  songCover: string;
+  commentTime: string;
+};
+
+export type UserCommentsResponse = {
+  comments: UserComment[];
+  lastId: string;
+};

@@ -40,7 +40,7 @@ async function updatePrismPlusConstants(spreadsheet: GoogleSpreadsheet) {
     spreadsheet,
     "PRiSM PLUS新曲",
     [0, 1, 2, 4],
-    [0, 6],
+    [0, 6, 12],
   );
   await updateConstantFromSheet(
     spreadsheet,
