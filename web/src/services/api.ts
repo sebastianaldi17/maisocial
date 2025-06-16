@@ -60,6 +60,16 @@ export class BackendApi {
     return await response.json();
   }
 
+  static async fetchAllSongs(): Promise<Song[]> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/songs/all-songs`,
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch songs");
+    }
+    return await response.json();
+  }
+
   static async submitComment(
     songId: string,
     content: string,

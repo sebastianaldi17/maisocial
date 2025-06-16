@@ -46,6 +46,14 @@ export default function MainLayout({
             Songs
           </Link>
         </nav>
+        <nav className="px-4 pt-2">
+          <Link
+            className="block p-2 rounded hover:bg-gray-700"
+            href="/playlists"
+          >
+            Playlists
+          </Link>
+        </nav>
         {session && (
           <nav className="px-4 py-2">
             <Link

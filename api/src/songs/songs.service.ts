@@ -141,6 +141,11 @@ export class SongsService {
     return songsMap;
   }
 
+  async getAllSongs(): Promise<Song[]> {
+    const songs = await this.songsModel.find().sort({ _id: -1 });
+    return songs;
+  }
+
   async getVersions(): Promise<string[]> {
     const versions = await this.songsModel.distinct("version");
     return versions;
