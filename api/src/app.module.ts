@@ -6,6 +6,7 @@ import { ConfigModule } from "@nestjs/config";
 import { CommentsModule } from "./comments/comments.module";
 import { UsersModule } from "./users/users.module";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { PlaylistsModule } from "./playlists/playlists.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
     SongsModule,
     CommentsModule,
     UsersModule,
+    PlaylistsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

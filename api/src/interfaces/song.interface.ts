@@ -9,6 +9,7 @@ export interface Song extends Document {
   readonly cover: string;
   readonly difficulties: [
     {
+      _id: string;
       difficulty: string;
       level: string;
       internalLevel: number;

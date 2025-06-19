@@ -1,42 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import {
-  minLevels,
-  maxLevels,
-  levels,
-  DifficultyFilterMode,
-} from "@/constants/constants";
-import { LucideBookA, LucideHash } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/contexts/sessionContext";
 import Link from "next/link";
+import { BackendApi } from "@/services/api";
+import { Playlist } from "@/classes/playlist";
 
 export default function PlaylistsPage() {
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [myPlaylists, setMyPlaylists] = useState(false);
   const [search, setSearch] = useState("");
-  const [minLevel, setMinLevel] = useState("0");
-  const [maxLevel, setMaxLevel] = useState("15");
-
-  const [useConstant, setUseConstant] = useState(false);
 
   const { session } = useSession();
 
-  const getLevels = (mode: DifficultyFilterMode) => {
-    if (useConstant) {
-      return levels;
-    }
-
-    if (mode === DifficultyFilterMode.Min) {
-      return minLevels;
+  const fetchPlaylists = async (
+    replace: boolean,
+    search?: string,
+    userId?: string,
+    nextId?: string,
+  ) => {
+    const playlists = await BackendApi.fetchPlaylists(search, userId, nextId);
+    if (replace) {
+      setPlaylists(playlists);
     } else {
-      return maxLevels;
+      setPlaylists((prev) => [...prev, ...playlists]);
     }
   };
 
-  const toggleConstantSearch = () => {
-    setUseConstant(!useConstant);
-    setMinLevel("1.0");
-    setMaxLevel("15.0");
-  };
+  useEffect(() => {
+    fetchPlaylists(true);
+  }, []);
 
   return (
     <div className="max-w-3xl px-2 mx-auto">
@@ -51,50 +44,23 @@ export default function PlaylistsPage() {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-4 mb-4 max-w-3xl mx-auto">
-          <div className="flex flex-row gap-4">
-            <select
-              className="p-2 border border-gray-600 rounded-lg flex-1"
-              value={minLevel}
-              onChange={(e) => setMinLevel(e.target.value)}
+        {session && (
+          <div className="flex items-center">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              checked={myPlaylists}
+              onChange={(e) => setMyPlaylists(e.target.checked)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label
+              htmlFor="default-checkbox"
+              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
             >
-              <option value="1.0">Min level</option>
-              {getLevels(DifficultyFilterMode.Min).map((item) => {
-                const [label, value] = item;
-                if (value === "1.0") return null;
-                return (
-                  <option key={`${value}-min`} value={value}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
-            <select
-              className="p-2 border border-gray-600 rounded-lg flex-1"
-              value={maxLevel}
-              onChange={(e) => setMaxLevel(e.target.value)}
-            >
-              <option value="15.0">Max level</option>
-              {getLevels(DifficultyFilterMode.Max).map((item) => {
-                const [label, value] = item;
-                if (value === "15.0") return null;
-                return (
-                  <option key={`${label}-max`} value={value}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
-            <button
-              className="hover:bg-gray-200 p-2 border border-gray-600 rounded-lg flex items-center justify-center"
-              onClick={() => {
-                toggleConstantSearch();
-              }}
-            >
-              {useConstant ? <LucideHash /> : <LucideBookA />}
-            </button>
+              Only my playlists?
+            </label>
           </div>
-        </div>
+        )}
         {session && (
           <div className="mt-4">
             <Link
