@@ -7,6 +7,7 @@ import {
   Get,
   Param,
   Delete,
+  Query,
 } from "@nestjs/common";
 import { PlaylistsService } from "./playlists.service";
 import { SupabaseGuard } from "src/guards/supabase.guard";
@@ -39,6 +40,14 @@ export class PlaylistsController {
       throw new Error("Playlist title and songs are required");
     }
 
+    if (playlistName.length < 3 || playlistName.length > 50) {
+      throw new Error("Playlist title must be between 3 and 50 characters");
+    }
+
+    if (songs.length > 4) {
+      throw new Error("You can only add up to 4 songs to a playlist");
+    }
+
     try {
       await this.playlistsService.createPlaylist(playlistName, songs, user);
     } catch (error) {
@@ -49,16 +58,12 @@ export class PlaylistsController {
 
   @Get("/")
   async getPlaylists(
-    @Param("title") titleFilter?: string,
-    @Param("userId") userId?: string,
-    @Param("nextId") nextId?: string,
+    @Query("title") title?: string,
+    @Query("userId") userId?: string,
+    @Query("nextId") nextId?: string,
   ) {
     try {
-      return await this.playlistsService.getPlaylists(
-        titleFilter,
-        userId,
-        nextId,
-      );
+      return await this.playlistsService.getPlaylists(title, userId, nextId);
     } catch (error) {
       console.error(error);
       throw new Error("An error occurred while fetching playlists");

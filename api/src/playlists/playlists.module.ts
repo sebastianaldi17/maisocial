@@ -9,5 +9,6 @@ import { SongsModule } from "src/songs/songs.module";
   imports: [DatabaseModule, SongsModule],
   controllers: [PlaylistsController],
   providers: [PlaylistsService, ...playlistsProviders],
+  exports: [PlaylistsService],
 })
 export class PlaylistsModule {}

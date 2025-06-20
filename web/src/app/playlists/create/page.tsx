@@ -114,9 +114,15 @@ export default function CreatePlaylistPage() {
       alert("You must be logged in to create a playlist.");
       return;
     }
-    const playlistName = prompt("Enter a name for your playlist:");
+    const playlistName = prompt(
+      "Enter a name for your playlist (3-50 characters):",
+    );
     if (!playlistName) {
       alert("Playlist name cannot be empty.");
+      return;
+    }
+    if (playlistName.length < 3 || playlistName.length > 50) {
+      alert("Playlist name must be between 3 and 50 characters.");
       return;
     }
     const playlistSongs: PlaylistSong[] = selectedSongs.map((selection) => ({
@@ -130,8 +136,7 @@ export default function CreatePlaylistPage() {
     try {
       await BackendApi.createPlaylist(requestData, session.access_token);
       alert("Playlist created successfully!");
-      setSelectedSongs([]);
-      setSearchTerm("");
+      window.location.href = "/playlists";
     } catch (error) {
       alert("Error creating playlist, please try again later.");
       console.error("Error creating playlist:", error);

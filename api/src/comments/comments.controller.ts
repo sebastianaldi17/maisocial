@@ -16,6 +16,7 @@ import { Request as CustomRequest } from "src/types/request";
 import { CommentsService } from "./comments.service";
 import { Comment } from "src/interfaces/comment.interface";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { OnEvent } from "@nestjs/event-emitter";
 
 @Controller("v1/comments")
 export class CommentsController {
@@ -26,10 +27,10 @@ export class CommentsController {
   @UseGuards(ThrottlerGuard)
   async createComment(
     @Param("parentId") parentId: string,
-    @Body() body: { content: string },
+    @Body() body: { content: string; parentType: string },
     @Request() request: CustomRequest,
   ) {
-    const { content } = body;
+    const { content, parentType } = body;
     const { user } = request;
 
     if (!user) {
@@ -51,7 +52,12 @@ export class CommentsController {
     }
 
     try {
-      await this.commentsService.createComment(parentId, body.content, user);
+      await this.commentsService.createComment(
+        parentId,
+        parentType,
+        body.content,
+        user,
+      );
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -117,5 +123,14 @@ export class CommentsController {
     }
 
     await this.commentsService.deleteComment(commentId, request.user!.id);
+  }
+
+  @OnEvent("playlist.deleted")
+  async handlePlaylistDeletedEvent(event: { playlistId: string }) {
+    try {
+      await this.commentsService.deleteCommentsByParentId(event.playlistId);
+    } catch (error) {
+      console.error("Error deleting comments for playlist:", error);
+    }
   }
 }

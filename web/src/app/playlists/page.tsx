@@ -5,11 +5,18 @@ import { useSession } from "@/contexts/sessionContext";
 import Link from "next/link";
 import { BackendApi } from "@/services/api";
 import { Playlist } from "@/classes/playlist";
+import InfiniteScroll from "react-infinite-scroll-component";
+import Image from "next/image";
+
+const DEBOUNCE_TIME = 500;
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [myPlaylists, setMyPlaylists] = useState(false);
   const [search, setSearch] = useState("");
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [lastId, setLastId] = useState<string>("");
 
   const { session } = useSession();
 
@@ -19,17 +26,70 @@ export default function PlaylistsPage() {
     userId?: string,
     nextId?: string,
   ) => {
-    const playlists = await BackendApi.fetchPlaylists(search, userId, nextId);
-    if (replace) {
-      setPlaylists(playlists);
-    } else {
-      setPlaylists((prev) => [...prev, ...playlists]);
+    setFetching(true);
+    try {
+      const playlists = await BackendApi.fetchPlaylists(search, userId, nextId);
+      if (replace) {
+        setPlaylists(playlists);
+      } else {
+        setPlaylists((prev) => [...prev, ...playlists]);
+      }
+      setLastId(
+        playlists.length > 0 ? playlists[playlists.length - 1].playlistId : "",
+      );
+      setHasMore(playlists.length > 0);
+      setFetching(false);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+      alert("Failed to fetch playlists. Please try again later.");
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const fetchMorePlaylists = async () => {
+    fetchPlaylists(
+      false,
+      search,
+      myPlaylists ? session?.user.id : undefined,
+      lastId,
+    );
+  };
+
+  const handleDeletePlaylist = async (
+    playlistId: string,
+    playlistTitle: string,
+  ) => {
+    if (!session) return;
+    if (
+      !confirm(
+        `Are you sure you want to delete the playlist "${playlistTitle}"?`,
+      )
+    )
+      return;
+
+    try {
+      await BackendApi.deletePlaylist(playlistId, session.access_token);
+      setPlaylists((prev) =>
+        prev.filter((playlist) => playlist.playlistId !== playlistId),
+      );
+    } catch (error) {
+      console.error("Error deleting playlist:", error);
+      alert("Failed to delete playlist. Please try again later.");
     }
   };
 
   useEffect(() => {
     fetchPlaylists(true);
   }, []);
+
+  useEffect(() => {
+    const debounceFn = setTimeout(() => {
+      fetchPlaylists(true, search, myPlaylists ? session?.user.id : undefined);
+    }, DEBOUNCE_TIME);
+
+    return () => clearTimeout(debounceFn);
+  }, [search, myPlaylists]);
 
   return (
     <div className="max-w-3xl px-2 mx-auto">
@@ -51,11 +111,11 @@ export default function PlaylistsPage() {
               type="checkbox"
               checked={myPlaylists}
               onChange={(e) => setMyPlaylists(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 focus:ring-2"
             />
             <label
               htmlFor="default-checkbox"
-              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ms-2 text-sm font-medium"
             >
               Only my playlists?
             </label>
@@ -70,6 +130,71 @@ export default function PlaylistsPage() {
               Create new playlist
             </Link>
           </div>
+        )}
+        {playlists.length === 0 ? (
+          <div className="text-center text-gray-500 mt-10">
+            {fetching ? "Loading..." : "No playlists found."}
+          </div>
+        ) : (
+          <InfiniteScroll
+            dataLength={playlists.length}
+            next={fetchMorePlaylists}
+            hasMore={hasMore}
+            loader={<p className="text-center mt-4">Loading more...</p>}
+          >
+            {playlists.map((playlist) => (
+              <div
+                className="flex flex-col p-4 my-4 border border-gray-300 rounded-lg shadow-md"
+                key={playlist.playlistId}
+              >
+                <Link
+                  href={`/playlists/${playlist.playlistId}`}
+                  className="font-bold text-lg mb-2"
+                >
+                  {playlist.playlistName}
+                </Link>
+                <div className="flex items-center mb-1">
+                  <span className="mr-2">Created by</span>
+                  <Image
+                    src={playlist.profileImage}
+                    alt={playlist.username}
+                    className="w-6 h-6 rounded-full mr-2"
+                    width={24}
+                    height={24}
+                  />
+                  <span className="text-gray-700">{playlist.username}</span>
+                </div>
+                <span className="text-sm text-gray-500 mb-3">
+                  {new Date(playlist.createdAt).toLocaleString()}
+                  {playlist.userId === session?.user.id && (
+                    <button
+                      className="text-red-500 hover:text-red-700 ml-2"
+                      onClick={() => {
+                        handleDeletePlaylist(
+                          playlist.playlistId,
+                          playlist.playlistName,
+                        );
+                      }}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </span>
+                <div className="flex gap-2">
+                  {playlist.songs.map((song, index) => (
+                    <Image
+                      key={index}
+                      src={song.cover || "/default-cover.jpg"}
+                      alt={`Song ${index + 1}`}
+                      className="w-16 h-16 object-cover rounded-lg"
+                      width={64}
+                      height={64}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </InfiniteScroll>
         )}
       </div>
     </div>

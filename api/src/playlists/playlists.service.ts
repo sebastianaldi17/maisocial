@@ -10,6 +10,7 @@ import {
 } from "src/interfaces/playlist.interface";
 import { Song } from "src/interfaces/song.interface";
 import { SongsService } from "src/songs/songs.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 
 @Injectable()
 export class PlaylistsService {
@@ -17,6 +18,7 @@ export class PlaylistsService {
     @Inject("PLAYLIST_MODEL")
     private playlistsModel: Model<Playlist>,
     private songsService: SongsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createPlaylist(
@@ -162,6 +164,22 @@ export class PlaylistsService {
     };
   }
 
+  async getPlaylistsByIds(
+    playlistIds: string[],
+  ): Promise<Map<string, Playlist>> {
+    const playlists = await this.playlistsModel.find({
+      _id: {
+        $in: playlistIds,
+      },
+    });
+
+    const playlistsMap = new Map<string, Playlist>();
+    for (const playlist of playlists) {
+      playlistsMap.set(playlist._id.toString(), playlist);
+    }
+    return playlistsMap;
+  }
+
   async deletePlaylist(playlistId: string, user: User) {
     const playlist = await this.playlistsModel.findById(playlistId);
     if (!playlist) {
@@ -176,5 +194,13 @@ export class PlaylistsService {
     }
 
     await this.playlistsModel.findByIdAndDelete(playlistId);
+    this.eventEmitter.emit("playlist.deleted", { playlistId: playlistId });
+  }
+
+  async updatePlaylistNickname(userId: string, nickname: string) {
+    await this.playlistsModel.updateMany(
+      { userId: userId },
+      { username: nickname },
+    );
   }
 }

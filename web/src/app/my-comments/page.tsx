@@ -1,15 +1,21 @@
 "use client";
 
-import { UserComment } from "@/classes/comment";
 import { useSession } from "@/contexts/sessionContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BackendApi } from "@/services/api";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {
+  CommentParentTypeEnum,
+  UserCommentWithPlaylist,
+  UserCommentWithSong,
+} from "@/classes/comment";
 
 export default function MyCommentsPage() {
-  const [comments, setComments] = useState<UserComment[]>([]);
+  const [comments, setComments] = useState<
+    (UserCommentWithSong | UserCommentWithPlaylist)[]
+  >([]);
   const [fetching, setFetching] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [lastId, setLastId] = useState<string>("");
@@ -89,50 +95,103 @@ export default function MyCommentsPage() {
           loader={<p className="text-center mt-4">Loading more...</p>}
         >
           {comments.map((comment) => {
-            return (
-              <div
-                className="flex p-4 my-4 border border-gray-300 rounded-lg shadow-md"
-                key={`${comment.commentId}`}
-              >
-                <Link
-                  href={`/song/${comment.songId}`}
-                  className="mr-4 block flex-shrink-0"
+            if (comment.parentType === CommentParentTypeEnum.SONG) {
+              const songComment = comment as UserCommentWithSong;
+              return (
+                <div
+                  className="flex p-4 my-4 border border-gray-300 rounded-lg shadow-md"
+                  key={`${comment.commentId}`}
                 >
-                  <Image
-                    src={comment.songCover}
-                    alt={comment.title}
-                    width={96}
-                    height={96}
-                    className="object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                  />
-                </Link>
-                <div className="flex flex-col my-auto min-w-0">
                   <Link
-                    className="font-bold truncate text-ellipsis"
-                    href={`/song/${comment.songId}`}
+                    href={`/song/${songComment.parentId}`}
+                    className="mr-4 block flex-shrink-0"
                   >
-                    {comment.title}
+                    <Image
+                      src={songComment.songCover}
+                      alt={songComment.title}
+                      width={96}
+                      height={96}
+                      className="object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    />
                   </Link>
-                  <p className="text-gray-500 truncate text-ellipsis">
-                    {comment.artist}
-                  </p>
-                  <p className="text-gray-500 truncate text-ellipsis">
-                    {`Your comment: ${comment.comment}`}
-                  </p>
-                  <span className="text-sm text-gray-500">
-                    {new Date(comment.commentTime).toLocaleString()}
-                    <button
-                      className="text-red-500 hover:text-red-700 ml-2"
-                      onClick={() =>
-                        handleDeleteComment(comment.commentId, comment.title)
-                      }
+                  <div className="flex flex-col my-auto min-w-0">
+                    <Link
+                      className="font-bold truncate text-ellipsis"
+                      href={`/song/${songComment.parentId}`}
                     >
-                      Delete
-                    </button>
-                  </span>
+                      {songComment.title}
+                    </Link>
+                    <p className="text-gray-500 truncate text-ellipsis">
+                      {songComment.artist}
+                    </p>
+                    <p className="text-gray-500 truncate text-ellipsis">
+                      {`Your comment: ${songComment.comment}`}
+                    </p>
+                    <span className="text-sm text-gray-500">
+                      {new Date(songComment.commentTime).toLocaleString()}
+                      <button
+                        className="text-red-500 hover:text-red-700 ml-2"
+                        onClick={() =>
+                          handleDeleteComment(
+                            songComment.commentId,
+                            songComment.title,
+                          )
+                        }
+                      >
+                        Delete
+                      </button>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
+              );
+            }
+            if (comment.parentType === CommentParentTypeEnum.PLAYLIST) {
+              const playlistComment = comment as UserCommentWithPlaylist;
+              return (
+                <div
+                  className="flex p-4 my-4 border border-gray-300 rounded-lg shadow-md"
+                  key={`${comment.commentId}`}
+                >
+                  <Link
+                    href={`/playlists/${playlistComment.parentId}`}
+                    className="mr-4 block flex-shrink-0"
+                  >
+                    <Image
+                      src={playlistComment.profileImage}
+                      alt={playlistComment.playlistTitle}
+                      width={96}
+                      height={96}
+                      className="object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    />
+                  </Link>
+                  <div className="flex flex-col my-auto min-w-0">
+                    <Link
+                      className="font-bold truncate text-ellipsis"
+                      href={`/playlists/${playlistComment.parentId}`}
+                    >
+                      {playlistComment.playlistTitle}
+                    </Link>
+                    <p className="text-gray-500 truncate text-ellipsis">
+                      {`Your comment: ${playlistComment.comment}`}
+                    </p>
+                    <span className="text-sm text-gray-500">
+                      {new Date(playlistComment.commentTime).toLocaleString()}
+                      <button
+                        className="text-red-500 hover:text-red-700 ml-2"
+                        onClick={() =>
+                          handleDeleteComment(
+                            playlistComment.commentId,
+                            playlistComment.playlistTitle,
+                          )
+                        }
+                      >
+                        Delete
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              );
+            }
           })}
         </InfiniteScroll>
       )}

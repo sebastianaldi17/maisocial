@@ -22,7 +22,7 @@ export interface PlaylistSongWithDetails {
 }
 
 export interface Playlist {
-  _id: string;
+  playlistId: string;
   userId: string;
   username: string;
   profileImage: string;

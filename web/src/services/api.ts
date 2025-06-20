@@ -1,4 +1,8 @@
-import { CommentsResponse, UserCommentsResponse } from "@/classes/comment";
+import {
+  CommentParentTypeEnum,
+  CommentsResponse,
+  UserCommentsResponse,
+} from "@/classes/comment";
 import { CreatePlaylistRequest, Playlist } from "@/classes/playlist";
 import { Song } from "@/classes/song";
 
@@ -72,12 +76,13 @@ export class BackendApi {
   }
 
   static async submitComment(
-    songId: string,
+    parentId: string,
+    parentType: CommentParentTypeEnum,
     content: string,
     token: string,
   ): Promise<Response> {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/comments/parent/${songId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/comments/parent/${parentId}`,
       {
         method: "POST",
         headers: {
@@ -86,6 +91,7 @@ export class BackendApi {
         },
         body: JSON.stringify({
           content,
+          parentType,
         }),
       },
     );

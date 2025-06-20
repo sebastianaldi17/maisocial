@@ -1,6 +1,12 @@
+export enum CommentParentTypeEnum {
+  PLAYLIST = "PLAYLIST",
+  SONG = "SONG",
+}
+
 export type Comment = {
   _id: string;
   parentId: string;
+  parentType: CommentParentTypeEnum;
   userId: string;
   nickname: string;
   profileImage: string;
@@ -13,17 +19,26 @@ export type CommentsResponse = {
   lastId: string;
 };
 
-export type UserComment = {
+export interface CommonCommentFields {
   commentId: string;
-  songId: string;
+  parentId: string;
+  parentType: CommentParentTypeEnum;
+  commentTime: string;
+  comment: string;
+}
+
+export interface UserCommentWithSong extends CommonCommentFields {
   title: string;
   artist: string;
-  comment: string;
   songCover: string;
-  commentTime: string;
-};
+}
+
+export interface UserCommentWithPlaylist extends CommonCommentFields {
+  playlistTitle: string;
+  profileImage: string;
+}
 
 export type UserCommentsResponse = {
-  comments: UserComment[];
+  comments: (UserCommentWithSong | UserCommentWithPlaylist)[];
   lastId: string;
 };
