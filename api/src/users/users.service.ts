@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { ConfigService } from "@nestjs/config";
 import { CommentsService } from "src/comments/comments.service";
+import { PlaylistsService } from "src/playlists/playlists.service";
 
 @Injectable()
 export class UsersService {
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     private configService: ConfigService,
     private commentsService: CommentsService,
+    private playlistsService: PlaylistsService,
   ) {
     this.supabase = createClient(
       this.configService.get<string>("SUPABASE_URL") || "",
@@ -27,5 +29,6 @@ export class UsersService {
     }
 
     await this.commentsService.updateCommentNickname(userId, nickname);
+    await this.playlistsService.updatePlaylistNickname(userId, nickname);
   }
 }

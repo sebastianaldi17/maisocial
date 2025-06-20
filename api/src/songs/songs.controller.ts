@@ -71,6 +71,11 @@ export class SongsController {
     };
   }
 
+  @Get("/all-songs")
+  async getAllSongs() {
+    return await this.songsService.getAllSongs();
+  }
+
   @Get("/song/:id")
   async getSongById(@Param("id") id: string) {
     if (mongoose.isValidObjectId(id) === false) {

@@ -1,7 +1,13 @@
 import { Document } from "mongoose";
 
+export enum CommentParentTypeEnum {
+  PLAYLIST = "PLAYLIST",
+  SONG = "SONG",
+}
+
 export interface Comment extends Document {
   readonly parentId: string;
+  readonly parentType: CommentParentTypeEnum;
   readonly userId: string;
   readonly nickname: string;
   readonly profileImage: string;
@@ -16,12 +22,21 @@ export interface CommentQuery {
   _id?: { $lt: string };
 }
 
-export interface UserCommentWithSong {
+export interface CommonCommentFields {
   commentId: string;
-  songId: string;
+  parentId: string;
+  parentType: CommentParentTypeEnum;
+  commentTime: string;
+  comment: string;
+}
+
+export interface UserCommentWithSong extends CommonCommentFields {
   title: string;
   artist: string;
-  comment: string;
   songCover: string;
-  commentTime: string;
+}
+
+export interface UserCommentWithPlaylist extends CommonCommentFields {
+  playlistTitle: string;
+  profileImage: string;
 }

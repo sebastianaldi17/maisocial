@@ -3,9 +3,12 @@ import { User } from "@supabase/supabase-js";
 import mongoose, { Model } from "mongoose";
 import {
   Comment,
+  CommentParentTypeEnum,
   CommentQuery,
+  UserCommentWithPlaylist,
   UserCommentWithSong,
 } from "src/interfaces/comment.interface";
+import { PlaylistsService } from "src/playlists/playlists.service";
 import { SongsService } from "src/songs/songs.service";
 
 @Injectable()
@@ -13,13 +16,20 @@ export class CommentsService {
   constructor(
     @Inject("COMMENT_MODEL")
     private commentsModel: Model<Comment>,
+    private playlistsService: PlaylistsService,
     private songsService: SongsService,
   ) {}
 
-  async createComment(parentId: string, content: string, user: User) {
+  async createComment(
+    parentId: string,
+    parentType: string,
+    content: string,
+    user: User,
+  ) {
     await this.commentsModel.create({
       _id: new mongoose.Types.ObjectId(),
       parentId: parentId,
+      parentType: parentType,
       userId: user.id,
       nickname: (user.user_metadata?.nickname as string) || user.id,
       profileImage: (user.user_metadata?.avatar_url as string) || "",
@@ -59,7 +69,7 @@ export class CommentsService {
   async getCommentsByUserId(
     userId: string,
     nextId?: string,
-  ): Promise<UserCommentWithSong[]> {
+  ): Promise<(UserCommentWithSong | UserCommentWithPlaylist)[]> {
     const query: CommentQuery = {
       userId: userId,
     };
@@ -71,23 +81,45 @@ export class CommentsService {
       .sort({ _id: -1 })
       .limit(10);
     const songIds = new Set<string>();
+    const playlistIds = new Set<string>();
     comments.map((comment) => {
-      songIds.add(comment.parentId);
+      if (comment.parentType === CommentParentTypeEnum.SONG) {
+        songIds.add(comment.parentId);
+      } else if (comment.parentType === CommentParentTypeEnum.PLAYLIST) {
+        playlistIds.add(comment.parentId);
+      }
     });
 
     const songs = await this.songsService.getSongsByIds(Array.from(songIds));
-    const response: UserCommentWithSong[] = [];
+    const playlists = await this.playlistsService.getPlaylistsByIds(
+      Array.from(playlistIds),
+    );
+    const response: (UserCommentWithSong | UserCommentWithPlaylist)[] = [];
     for (let i = 0; i < comments.length; i++) {
       const comment = comments[i];
-      const song = songs.get(comment.parentId);
-      if (song) {
+      if (comment.parentType === CommentParentTypeEnum.SONG) {
+        const song = songs.get(comment.parentId);
+        if (!song) continue;
         response.push({
           commentId: comment._id,
-          songId: song._id,
+          parentId: song._id,
+          parentType: comment.parentType,
           comment: comment.content,
           title: song.title,
           artist: song.artist,
           songCover: song.cover,
+          commentTime: comment.createdAt.toISOString(),
+        });
+      } else if (comment.parentType === CommentParentTypeEnum.PLAYLIST) {
+        const playlist = playlists.get(comment.parentId);
+        if (!playlist) continue;
+        response.push({
+          commentId: comment._id,
+          parentId: comment.parentId,
+          parentType: comment.parentType,
+          comment: comment.content,
+          playlistTitle: playlist.playlistName,
+          profileImage: comment.profileImage,
           commentTime: comment.createdAt.toISOString(),
         });
       }
@@ -113,5 +145,9 @@ export class CommentsService {
     }
 
     await this.commentsModel.findByIdAndDelete(commentId);
+  }
+
+  async deleteCommentsByParentId(parentId: string) {
+    await this.commentsModel.deleteMany({ parentId: parentId });
   }
 }
